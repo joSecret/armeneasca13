@@ -252,8 +252,8 @@
         // Date-based random generator
         class DateBasedRandom {
             constructor(date = new Date()) {
-                const dateStr = date.toISOString().split('T')[0];
-                this.seed = this.hashCode(dateStr);
+                this.dateStr = date.toISOString().split('T')[0];
+                this.baseSeed = this.hashCode(this.dateStr);
             }
 
             hashCode(str) {
@@ -266,14 +266,31 @@
                 return Math.abs(hash);
             }
 
-            random() {
-                this.seed = (this.seed * 1664525 + 1013904223) % Math.pow(2, 32);
-                return this.seed / Math.pow(2, 32);
+            // Get a seeded random value for a specific purpose
+            getSeededRandom(purpose = '') {
+                const seedStr = this.dateStr + purpose;
+                const seed = this.hashCode(seedStr);
+                return (seed % 1000000) / 1000000; // Normalize to 0-1
             }
 
+            // Get multiple random choices with different seeds
+            getMultipleChoices(arrays) {
+                const results = [];
+
+                for (let i = 0; i < arrays.length; i++) {
+                    const randomValue = this.getSeededRandom('_choice_' + i);
+                    const index = Math.floor(randomValue * arrays[i].length);
+                    results.push(arrays[i][index]);
+                }
+
+                return results;
+            }
+
+            // Single choice method (for compatibility)
             randomChoice(array) {
                 if (array.length === 0) return null;
-                const index = Math.floor(this.random() * array.length);
+                const randomValue = this.getSeededRandom('_single');
+                const index = Math.floor(randomValue * array.length);
                 return array[index];
             }
         }
@@ -437,9 +454,8 @@
             // Create daily random generator with selected date
             const dailyRandom = new DateBasedRandom(selectedDate);
 
-            // Select random car and restaurant
-            const selectedCar = dailyRandom.randomChoice(selectedCars);
-            const selectedRestaurant = dailyRandom.randomChoice(restaurants);
+            // Use the new method to get multiple different choices
+            const [selectedCar, selectedRestaurant] = dailyRandom.getMultipleChoices([selectedCars, restaurants]);
 
             // Display result
             showResult(selectedCar, selectedRestaurant, selectedDate);
