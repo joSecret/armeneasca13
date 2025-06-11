@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Car & Restaurant Generator</title>
     <style>
+        :root {
+            --c-accent: #4CAF50;
+            --body_bg: #f5f5f5;
+        }
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--body_bg);
         }
 
         .container {
@@ -97,7 +101,7 @@
 
         .car-checkbox:hover {
             background-color: #f0f8ff;
-            border-color: #4CAF50;
+            border-color: var(--c-accent);
         }
 
         .car-checkbox input[type="checkbox"] {
@@ -107,7 +111,7 @@
 
         .car-checkbox.checked {
             background-color: #e8f5e8;
-            border-color: #4CAF50;
+            border-color: var(--c-accent);
         }
 
         .generate-btn {
@@ -117,7 +121,7 @@
             font-size: 18px;
             font-weight: bold;
             color: white;
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: linear-gradient(45deg, var(--c-accent), #45a049);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -126,7 +130,7 @@
         }
 
         .generate-btn:hover {
-            background: linear-gradient(45deg, #45a049, #4CAF50);
+            background: linear-gradient(45deg, #45a049, var(--c-accent));
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
