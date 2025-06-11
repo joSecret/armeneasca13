@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Car & Restaurant Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .date-selector label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .date-selector input[type="date"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .date-selector button {
+            padding: 8px 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .date-selector button:hover {
+            background: #1976D2;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .car-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .car-checkbox:hover {
+            background-color: #f0f8ff;
+            border-color: #4CAF50;
+        }
+
+        .car-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .car-checkbox.checked {
+            background-color: #e8f5e8;
+            border-color: #4CAF50;
+        }
+
+        .generate-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .result h3 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            font-size: 20px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        .restaurants-list {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .restaurants-list ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .restaurants-list li {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .date-info {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #f44336;
+            margin: 15px 0;
+        }
+
+        .selected-date {
+            font-weight: bold;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗🍽️ Daily Car & Restaurant Generator</h1>
+
+        <div class="section">
+            <h2>📅 Date Selection</h2>
+            <div class="date-selector">
+                <label for="dateInput">Select Date:</label>
+                <input type="date" id="dateInput" onchange="updateSelectedDate()">
+                <button onclick="setToday()">Today</button>
+                <button onclick="setTomorrow()">Tomorrow</button>
+            </div>
+            <div class="date-info">
+                Selected date: <span class="selected-date" id="selectedDate"></span>
+                <br>
+                <small>Results will be consistent for the selected date!</small>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚗 Select Available Cars</h2>
+            <div class="cars-grid" id="carsGrid">
+                <!-- Cars will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🍽️ Available Restaurants</h2>
+            <div class="restaurants-list">
+                <p>Available restaurants for selection:</p>
+                <ul id="restaurantsList">
+                    <!-- Restaurants will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn" onclick="generateDailySelection()">
+            🎲 Generate Selection for Selected Date
+        </button>
+
+        <div id="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Date-based random generator
+        class DateBasedRandom {
+            constructor(date = new Date()) {
+                const dateStr = date.toISOString().split('T')[0];
+                this.seed = this.hashCode(dateStr);
+            }
+
+            hashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            }
+
+            random() {
+                this.seed = (this.seed * 1664525 + 1013904223) % Math.pow(2, 32);
+                return this.seed / Math.pow(2, 32);
+            }
+
+            randomChoice(array) {
+                if (array.length === 0) return null;
+                const index = Math.floor(this.random() * array.length);
+                return array[index];
+            }
+        }
+
+        // Static data
+        const availableCars = [
+            "🚗 Toyota Camry",
+            "🚙 Honda CR-V",
+            "🚘 BMW 3 Series",
+            "🚗 Mercedes C-Class",
+            "🚙 Audi Q5",
+            "🚗 Volkswagen Jetta",
+            "🚙 Subaru Outback",
+            "🚘 Lexus ES",
+            "🚗 Nissan Altima",
+            "🚙 Mazda CX-5",
+            "🚗 Hyundai Elantra",
+            "🚙 Ford Escape"
+        ];
+
+        const restaurants = [
+            "🍕 Mario's Pizza Palace",
+            "🍣 Sakura Sushi Bar",
+            "🍔 The Burger Joint",
+            "🌮 Taco Fiesta",
+            "🍝 Bella Italia",
+            "🥘 Spice Garden",
+            "🍖 Steakhouse Supreme",
+            "🍜 Noodle House",
+            "🌯 Mediterranean Delight",
+            "🍰 Sweet Treats Café",
+            "🥗 Fresh & Green",
+            "🍺 The Craft Kitchen"
+        ];
+
+        // Initialize the page
+        function initializePage() {
+            // Set default date to today
+            const today = new Date();
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = today.toISOString().split('T')[0];
+
+            // Update selected date display
+            updateSelectedDate();
+
+            // Populate cars checkboxes
+            populateCars();
+
+            // Populate restaurants list
+            populateRestaurants();
+
+            // Update generate button state
+            updateGenerateButton();
+        }
+
+        function updateSelectedDate() {
+            const dateInput = document.getElementById('dateInput');
+            const selectedDateSpan = document.getElementById('selectedDate');
+
+            if (dateInput.value) {
+                const selectedDate = new Date(dateInput.value + 'T00:00:00');
+                selectedDateSpan.textContent = selectedDate.toDateString();
+            } else {
+                selectedDateSpan.textContent = 'No date selected';
+            }
+
+            // Clear previous results when date changes
+            hideResult();
+        }
+
+        function setToday() {
+            const today = new Date();
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = today.toISOString().split('T')[0];
+            updateSelectedDate();
+        }
+
+        function setTomorrow() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = tomorrow.toISOString().split('T')[0];
+            updateSelectedDate();
+        }
+
+        function populateCars() {
+            const carsGrid = document.getElementById('carsGrid');
+            carsGrid.innerHTML = '';
+
+            availableCars.forEach((car, index) => {
+                const carDiv = document.createElement('div');
+                carDiv.className = 'car-checkbox';
+                carDiv.innerHTML = `
+                    <input type="checkbox" id="car${index}" value="${car}" onchange="updateGenerateButton()">
+                    <label for="car${index}">${car}</label>
+                `;
+
+                carDiv.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                        updateGenerateButton();
+                    }
+                    this.classList.toggle('checked', this.querySelector('input').checked);
+                });
+
+                carsGrid.appendChild(carDiv);
+            });
+        }
+
+        function populateRestaurants() {
+            const restaurantsList = document.getElementById('restaurantsList');
+            restaurantsList.innerHTML = '';
+
+            restaurants.forEach(restaurant => {
+                const li = document.createElement('li');
+                li.textContent = restaurant;
+                restaurantsList.appendChild(li);
+            });
+        }
+
+        function updateGenerateButton() {
+            const selectedCars = getSelectedCars();
+            const dateInput = document.getElementById('dateInput');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (selectedCars.length === 0) {
+                generateBtn.disabled = true;
+                generateBtn.textContent = '🚗 Please select at least one car';
+            } else if (!dateInput.value) {
+                generateBtn.disabled = true;
+                generateBtn.textContent = '📅 Please select a date';
+            } else {
+                generateBtn.disabled = false;
+                generateBtn.textContent = `🎲 Generate Selection for Selected Date (${selectedCars.length} cars available)`;
+            }
+
+            // Update checkbox styling
+            document.querySelectorAll('.car-checkbox').forEach(div => {
+                const checkbox = div.querySelector('input[type="checkbox"]');
+                div.classList.toggle('checked', checkbox.checked);
+            });
+        }
+
+        function getSelectedCars() {
+            const checkboxes = document.querySelectorAll('#carsGrid input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function getSelectedDate() {
+            const dateInput = document.getElementById('dateInput');
+            return dateInput.value ? new Date(dateInput.value + 'T00:00:00') : new Date();
+        }
+
+        function generateDailySelection() {
+            const selectedCars = getSelectedCars();
+            const selectedDate = getSelectedDate();
+            const dateInput = document.getElementById('dateInput');
+
+            if (selectedCars.length === 0) {
+                showError('Please select at least one car!');
+                return;
+            }
+
+            if (!dateInput.value) {
+                showError('Please select a date!');
+                return;
+            }
+
+            // Create daily random generator with selected date
+            const dailyRandom = new DateBasedRandom(selectedDate);
+
+            // Select random car and restaurant
+            const selectedCar = dailyRandom.randomChoice(selectedCars);
+            const selectedRestaurant = dailyRandom.randomChoice(restaurants);
+
+            // Display result
+            showResult(selectedCar, selectedRestaurant, selectedDate);
+        }
+
+        function showResult(car, restaurant, date) {
+            const resultDiv = document.getElementById('result');
+            const dateStr = date.toDateString();
+            const isToday = date.toDateString() === new Date().toDateString();
+            const isTomorrow = date.toDateString() === new Date(Date.now() + 86400000).toDateString();
+
+            let dateLabel = dateStr;
+            if (isToday) dateLabel += ' (Today)';
+            else if (isTomorrow) dateLabel += ' (Tomorrow)';
+
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h3>🎉 Selection for ${dateLabel}</h3>
+                    <div class="result-item">
+                        <strong>Your Car:</strong> ${car}
+                    </div>
+                    <div class="result-item">
+                        <strong>Your Restaurant:</strong> ${restaurant}
+                    </div>
+                    <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                        Generated for: ${dateStr}
+                        <br>
+                        <small>This combination will remain the same for this date!</small>
+                    </p>
+                </div>
+            `;
+
+            resultDiv.style.display = 'block';
+
+            // Smooth scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function hideResult() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'none';
+        }
+
+        // Initialize page when loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
